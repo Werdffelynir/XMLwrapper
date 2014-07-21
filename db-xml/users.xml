@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root id="4" group="users" date="1405942059">
+
+	<item id="1" group="user" order="" date="">
+		<name>Jone Smoth</name>
+		<email>jone@email.com</email>
+		<password>656554</password>
+	</item>
+
+	<item id="2" group="admin" order="" date="">
+		<name>OL Werdffelyir</name>
+		<email>werdffelyir@email.com</email>
+		<password>111111</password>
+	</item>
+
+	<item id="3" group="user" order="" date="">
+		<name>Mouse Losty</name>
+		<email>mouse@li.com</email>
+		<password>987545</password>
+	</item>
+
+</root>
