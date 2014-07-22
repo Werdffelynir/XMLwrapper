@@ -2,30 +2,35 @@
 
 <root id="6" group="articles" date="1405942059">
 
-	<item id="1" group="php" order="10" date="1405950154">
+	<item id="1" group="php" order="10" date="1405950154" url="/index/index">
 		<title>PHP SimpleXML</title>
 		<content>SimpleXML Some text for content!</content>
 	</item>
 
-	<item id="2" group="php" order="12" date="1405951587">
+	<item id="2" group="php" order="12" date="1405951587" url="/index/blog">
 		<title>Some Classe XML</title>
 		<content>Classe XML Some text for content!</content>
 	</item>
 
-	<item id="3" group="css" order="18" date="1405952879">
+	<item id="3" group="css" order="18" date="1405952879" url="/index/about">
 		<title>Style in to page</title>
 		<content>Style in Some text for content!</content>
 	</item>
 
-	<item id="5" group="css" order="15" date="1405953987">
+	<item id="5" group="css" order="15" date="1405953987" url="/index/contacts">
 		<title>Color manipulation</title>
 		<content>Color Some text for content!</content>
 	</item>
 
+    <item id="6" group="xml" order="15" date="1404553987" url="/index/xml">
+        <title>Xml simple</title>
+        <content>Eris XML Some text for content!</content>
+    </item>
+<!--
 	<common>
 		<rating id="category-php">8/10</rating>
 		<rating id="category-css">6/10</rating>
 		<rating id="category-xml">7/10</rating>
-	</common>
+	</common>-->
 
 </root>
