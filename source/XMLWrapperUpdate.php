@@ -14,12 +14,7 @@ class XMLWrapperUpdate
   public $selectValue=null;     // array('id'=>1)
   public $selectLocation=null;  // attr
 
-  public function select()
-  {
-
-  }
-
-  public function updateItem($itemSelector, $itemValue)
+  public function item($itemSelector, $itemValue)
   {
     $selectKey = key($this->selectValue);
     $selectVal = $this->selectValue[$selectKey];
@@ -51,7 +46,7 @@ class XMLWrapperUpdate
   }
 
 
-  public function updateAttr($itemSelector, $itemValue)
+  public function attr($itemSelector, $itemValue)
   {
     $updateRows = 0;
 
@@ -67,7 +62,7 @@ class XMLWrapperUpdate
 
 
 
-  public function updateItemAttr($itemSelector, $itemValue)
+  public function itemAttr($itemSelector, $itemValue)
   {
     $selectKey = key($this->selectValue);
     $selectVal = $this->selectValue[$selectKey];

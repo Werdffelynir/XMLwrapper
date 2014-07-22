@@ -4,7 +4,7 @@ include './source/XMLWrapper.php';
 
 $xml = new XMLWrapper();
 
-/*
+/** @ready
 $xml->config(array(
 	'dbPath'=>__DIR__.'/xml/';
 	));
@@ -49,22 +49,6 @@ $items = $xml->doc('articles')->item;
  * }
  */
 
-
-/*
-foreach($xml->doc('articles')->common->rating as $items){
-    var_dump($items);
-}
-*/
-
-//$articles = $xml->doc('articles');
-
-/*
-foreach ($articles->items() as $item) {
-    echo "<h2> <a href=\"$item[url]\"> $item->title</a> </h2>";
-    echo "<div> $item->content </div>";
-    echo <i>Опубликовано: ".date('m.d.Y H:i', (string)$item['date']).". Категория (".$item['group'].") </i>";
-}
-*/
 
 
 /* @ready toArray(TYPE=1) default
@@ -149,23 +133,61 @@ $xml->save();
  */
 
 
+/** @ready Создание новой записи
 $xml->insert('newDoc2');
+
 $xml->insertItem('title','insert title!');
-$xml->insertItem('description','insert description!');
-
-
 $xml->insertItem(
-    array(
-        'charset'=>'insert charset UTF-8!',
-        'keywords'=>'insert KEYWORDS!',
-    ));
+array(
+    'charset'=>'insert charset UTF-8!',
+    'keywords'=>'insert KEYWORDS!',
+));
 
 $xml->insertAttr('order','120');
 $xml->insertAttr(array(
-        'url'=>'https://bce.cosmonova.net',
-        'group'=>'killers',
-    ));
-    /**/
+    'url'=>'https://bce.cosmonova.net',
+    'group'=>'killers',
+));
+*/
+
+
+
+/** @ready Удаление файлов
+$xml->delete('newDoc');
 $xml->save();
-//var_dump($xml->XMLWrapperInsert->xml);
+ */
+
+$header[] = '<h1>Декодирование HTML-сущностей</h1>';
+$header[] = '<h1>Можно заострить внимание посетителя</h1>';
+$header[] = '<h1>SQL-инъекции</h1>';
+$text[] = '<p>Может показаться странным, что результатом вызова trim(html_entity_decode()); не является пустая строка. Причина том, преобразуется не в символ с ASCII-кодом 32(который удаляется функцией trim())</p><p>Данная функция предназначена для отображения кода и HTML-разметки на Web-странице, но вводимые пользователем данные не мешает пропускать через неё, во избежание неприятностей. </p>';
+$text[] = '<p>Следует проверять ВСЕ переменные получаемые от пользователя — GET, POST, COOKIE. Во все из них без труда можно встроить зловредный код. Особое внимание следует уделять паролям, так как в них не принято вводить ограничения, на символы.</p><p>SQL-инъекции — абсолютно другой вид атаки и он наиболее опасен. В Web-приложения, где есть данного  вида уязвимость, злоумышленник может внедрить свой SQL код, что может провести к потери информации, краже или полному  уничтожению базы данных.</p>';
+$text[] = '<p>SQL-инъекциито предпринять — выбор за вами. Лучше написать о разрешенных символах где-нибудь рядом с соответствующим полем HTML-формы, иначе посетитель может вести свое имя и обнаружить что оно отображается не совсем так, как он ожидал (например Elvi$ как Elvi) и ему придется проходить процедуру регистрации повторно. Кроме того, посетитель может случайно вести неверный символ и устрашающий вид страницы plz_die.php, может его отпугнуть.</p>';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

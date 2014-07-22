@@ -26,11 +26,5 @@
         <title>Xml simple</title>
         <content>Eris XML Some text for content!</content>
     </item>
-<!--
-	<common>
-		<rating id="category-php">8/10</rating>
-		<rating id="category-css">6/10</rating>
-		<rating id="category-xml">7/10</rating>
-	</common>-->
 
 </root>
