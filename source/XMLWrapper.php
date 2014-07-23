@@ -1,6 +1,7 @@
 <?php
 
 
+include 'XMLWrapperSelect.php';
 include 'XMLWrapperCreate.php';
 include 'XMLWrapperInsert.php';
 include 'XMLWrapperUpdate.php';
@@ -14,32 +15,44 @@ class XMLWrapper
     public $_listDocs = array();
     public $_listItems = array();
 
+    public $structureItem=null;
+    public $structureAttr=null;
+
+    public $XMLWrapperSelect = null;
     public $XMLWrapperCreate = null;
     public $XMLWrapperInsert = null;
     public $XMLWrapperUpdate = null;
     public $XMLWrapperDelete = null;
 
+    /** @var int $count */
+    public $count = 0;
+    public $updateRows = 0;
+    public $saveType = null;
+    public $xmlItem = null;
+    public $xmlAttr = null;
+    public $xml = null;
 
-    public function __construct()
+
+    public function __construct(array $config = null)
     {
-        $this->config();
+        $this->config($config);
     }
 
 
-    public function config(array $c = null)
+    public function config(array $config = null)
     {
-        if ($c == null) {
+        if ($config == null) {
             $path = dirname(__DIR__) . '/db-xml/';
             if (!$this->isDir($path)) {
                 $this->error('Не удалось создать директорию!');
             }
             $this->config['dbPath'] = $path;
         } else {
-            if (!empty($c['dbPath'])) {
-                if (!$this->isDir($c['dbPath'])) {
+            if (!empty($config['dbPath'])) {
+                if (!$this->isDir($config['dbPath'])) {
                     $this->error('Не удалось создать директорию!');
                 } else {
-                    $this->config = $c;
+                    $this->config = $config;
                 }
             } else {
                 $this->error('Параметр конфигурации должен быть массивом!');
@@ -48,101 +61,56 @@ class XMLWrapper
     }
 
 
-    public function toArray($typeBuild = 1)
+
+    #          S E L E C T   D O C   M E T H O D S         #
+
+    public function select($failName)
     {
-        $iter = 0;
-        $rootItems = array();
-        $xml = $this->xml;
-
-        foreach ($xml->item as $_item) {
-            $_attr = (array)$_item;
-            $_attrShift = array_shift($_attr);
-            if ($typeBuild == 1) {
-                $rootItems[$iter] = $_attr;
-                $rootItems[$iter]['attr'] = $_attrShift;
-            } else {
-                if ($typeBuild == 2) {
-                    $rootItems[$iter] = $_attrShift;
-                    $rootItems[$iter]['item'] = $_attr;
-                } else {
-                    $rootItems[$iter] = array_merge($_attr, $_attrShift);
-                }
-            }
-            $iter++;
-        }
-        return $rootItems;
+        if ($xml = $this->xml($failName)) {
+            $this->XMLWrapperSelect = new XMLWrapperSelect();
+            $this->XMLWrapperSelect->fileName = $failName;
+            $this->XMLWrapperSelect->init($xml);
+            $this->xmlAttr = $this->XMLWrapperSelect->xmlAttr;
+            $this->xmlItem = $this->XMLWrapperSelect->xmlItem;
+            $this->saveType = null;
+            return $this;
+        } else
+            $this->error();
     }
-
 
     public function item($id = null, $itemElement = null)
     {
-        if ($id == null && $this->xml == null) {
+        if ($this->xmlItem == null) {
             $this->error('XML resource is empty!');
         } else {
-            if ($id == null) {
-                return $this->xml;
-            } else {
-                if (is_numeric($id) && $itemElement == null) {
-                    foreach ($this->xml->item as $item) {
-                        if ((string)$item['id'] == $id) {
-                            return $item;
-                        }
-                    }
-                } else {
-                    if (is_numeric($id) && $itemElement != null) {
-                        foreach ($this->xml->item as $item) {
-                            if ((string)$item['id'] == $id) {
-                                return (string)$item->$itemElement;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public function attr($attr = null)
-    {
-        $_attrs = (array)$this->xml;
-        if ($attr == null) {
-            return $_attrs['@attributes'];
-        } else {
-            if (isset($_attrs['@attributes'][$attr])) {
-                return $_attrs['@attributes'][$attr];
-            } else {
-                return FALSE;
-            }
+            $result = $this->XMLWrapperSelect->item($id, $itemElement);
+            if($result!=null)
+                return $result;
+            else
+                $this->error('XML resource is empty!');
         }
     }
 
-
-    public function __get($item)
+    public function items($id=null)
     {
-        if (isset($this->xml[$item])) {
-            return (string)$this->xml[$item];
-        } else {
-            if (isset($this->xml->$item)) {
-                return $this->xml->$item;
-            } else {
-                return null;
-            }
+        if ($this->xmlItem == null)
+            $this->error('XML resource is empty!');
+
+        if ($id == null)
+            return $this->xmlItem;
+        else {
+            $result = $this->XMLWrapperSelect->item($id, null);
+
+            if($result!=null)
+                return $result;
+            else
+                $this->error('XML resource is empty!');
         }
     }
 
-
-    public function xml($file)
+    public function sort($attr = 'id', $asc = 'ASC', $num = true)
     {
-        $path = $this->config['dbPath'] . $file . '.xml';
-        if ($fileData = file_get_contents($path)) {
-            $xml = new SimpleXMLElement($fileData);
-            if ($xml) {
-                $this->xml = $xml;
-                return $xml;
-            } else
-                return false;
-        } else
-            return false;
+        return $this->XMLWrapperSelect->sort($attr, $asc, $num);
     }
 
 
@@ -150,7 +118,7 @@ class XMLWrapper
     {
         $dirRes = dir($this->config['dbPath']);
         while ($file = $dirRes->read()) {
-            if ($file != '.' and $file != '..' and is_dir($file)) {
+            if ($file != '.' and $file != '..' and !is_dir($file)) {
                 $this->_listDocs[] = $file;
             }
         }
@@ -158,10 +126,29 @@ class XMLWrapper
     }
 
 
-    public function listItems($doc)
+
+    /**
+     * @param string $type  'item' or 'attr'. Default 'item'
+     * @return array
+     */
+    public function structure($type='item')
     {
-        return $this;
+        if($this->structureItem==null){
+            foreach((array) $this->xml->item as $structureKey=>$structureValue){
+                if($structureKey != '@attributes')
+                    $this->structureItem[] = $structureKey;
+                if(is_array($structureValue))
+                    $this->structureAttr = array_keys($structureValue);
+            }
+        }
+
+        if($type=='item')
+            return $this->structureItem;
+        else if($type=='attr')
+            return $this->structureAttr;
     }
+
+
 
 
     #          C R E A T E   D O C   M E T H O D S         #
@@ -212,9 +199,6 @@ class XMLWrapper
         return $this;
     }
 
-    public $saveType = null;
-    public $xml = null;
-
 
 
     #          U P D A T E   D O C   M E T H O D S         #
@@ -240,7 +224,6 @@ class XMLWrapper
             $this->error();
     }
 
-    public $updateRows = 0;
 
     public function updateItem($item, $value)
     {
@@ -288,6 +271,8 @@ class XMLWrapper
             $this->XMLWrapperInsert = new XMLWrapperInsert();
             $this->XMLWrapperInsert->xml = $xml;
             $this->XMLWrapperInsert->fileName = $fileName;
+            $this->XMLWrapperInsert->structureItem = $this->structure('item');
+            $this->XMLWrapperInsert->structureAttr = $this->structure('attr');
 
             $this->saveType = 'insert';
             return $this;
@@ -295,8 +280,9 @@ class XMLWrapper
             $this->error();
     }
 
-    /** @var int $count */
-    public $count = 0;
+
+
+
 
     public function insertItem($item, $value = null)
     {
@@ -333,7 +319,10 @@ class XMLWrapper
     }
 
 
+
     #          D E L E T E   M E T H O D S         #
+
+
     public function delete($fileName, $dump=true)
     {
         if(is_file($this->config['dbPath'].$fileName.'.xml')){
@@ -351,6 +340,22 @@ class XMLWrapper
 
 
     #          S Y S T E M   M E T H O D S         #
+
+
+    public function xml($file)
+    {
+        $path = $this->config['dbPath'] . $file . '.xml';
+        if ($fileData = file_get_contents($path)) {
+            $xml = new SimpleXMLElement($fileData);
+            if ($xml) {
+                //$this->xml = $xml;
+                return $xml;
+            } else
+                return false;
+        } else
+            return false;
+    }
+
 
     /**
      * @return bool

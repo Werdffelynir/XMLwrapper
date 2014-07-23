@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root id="11" group="blog" date="1405942059">
+
+	<item id="1" group="php" order="3" date="1405950154" url="/index/index">
+		<title>PHP SimpleXML</title>
+		<content>SimpleXML Some text for content!</content>
+	</item>
+
+	<item id="2" group="php" order="12" date="1405951587" url="/index/blog">
+		<title>Some Classe XML</title>
+		<content>Classe XML Some text for content!</content>
+	</item>
+
+	<item id="5" group="css" order="18" date="1405952879" url="/index/about">
+		<title>Style in to page</title>
+		<content>Style in Some text for content!</content>
+	</item>
+
+	<item id="7" group="css" order="15" date="1405953987" url="/index/contacts">
+		<title>Color manipulation</title>
+		<content>Color Some text for content!</content>
+	</item>
+
+    <item id="3" group="css" order="13" date="1405953987" url="/index/contacts">
+        <title>Color manipulation</title>
+        <content>Color Some text for content!</content>
+    </item>
+
+    <item id="6" group="xml" order="8" date="1404553987" url="/index/xml">
+        <title>Xml simple</title>
+        <content>Eris XML Some text for content!</content>
+    </item>
+
+    <item id="4" group="xml" order="5" date="1404553987" url="/index/xml">
+        <title>Xml simple</title>
+        <content>Eris XML Some text for content!</content>
+    </item>
+
+    <item id="8" group="main" order="3" date="1404553987" url="/index/xml">
+        <title>Xml simple</title>
+        <content>Eris XML Some text for content!</content>
+    </item>
+
+    <item id="10" group="main" order="22" date="1404553987" url="/index/xml">
+        <title>10 Xml simple</title>
+        <content>10 Eris XML Some text for content!</content>
+    </item>
+
+</root>

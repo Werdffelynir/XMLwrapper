@@ -11,14 +11,7 @@ class XMLWrapperInsert
 
   public function init()
   {
-    if($this->structureItem==null){
-      foreach((array) $this->xml->item as $structureKey=>$structureValue){
-        if($structureKey != '@attributes')
-          $this->structureItem[] = $structureKey;
-        if(is_array($structureValue))
-          $this->structureAttr = array_keys($structureValue);
-      }
-    }
+
     if($this->itemData==null){
       $this->itemData = $this->xml->addChild('item');
       foreach($this->structureAttr as $attr){
