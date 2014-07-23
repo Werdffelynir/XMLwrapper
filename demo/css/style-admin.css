@@ -1,0 +1,41 @@
+*{
+    font-family: 'Ubuntu Condensed', sans-serif;
+}
+body{
+    font-size: 12px;
+}
+
+/* PAGE */
+.page{
+    width: 960px;
+    margin: 0 auto;
+}
+
+
+/* LOGIN */
+.box-login{
+    width: 200px;
+    margin: 200px auto;
+}
+
+/* LOGIN */
+.panel-top{
+    background: #01342E;
+    height: 30px;
+}
+.panel-top a{
+    display: inline-block;
+    background: #151C06;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 30px;
+    color: #E9F0F0;
+    text-decoration: none;
+    padding: 0 25px;
+}
+.panel-top a:hover{
+    color: #E9E2F0;
+}
+
+
+

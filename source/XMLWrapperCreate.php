@@ -18,7 +18,7 @@ class XMLWrapperCreate
 
 <root $rootAttrs>
 
-  <item $itemAttrs >
+  <item $itemAttrs>
 $itemRows
 
   </item>

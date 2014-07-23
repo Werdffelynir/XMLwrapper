@@ -48,13 +48,6 @@ class XMLWrapper
     }
 
 
-    public function doc($doc)
-    {
-        $this->xml($doc);
-        return $this;
-    }
-
-
     public function toArray($typeBuild = 1)
     {
         $iter = 0;
@@ -77,9 +70,9 @@ class XMLWrapper
             }
             $iter++;
         }
-
         return $rootItems;
     }
+
 
     public function item($id = null, $itemElement = null)
     {
