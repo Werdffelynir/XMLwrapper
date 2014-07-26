@@ -1,109 +1,171 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: Comp-2
+ * Class XMLWrapperSelect
+ *
+ * Author: OLWerdffelynir
  * Date: 22.07.14
  * Time: 16:46
  */
 
-class XMLWrapperSelect {
+class XMLWrapperSelect
+{
 
     public $fileName = null;
-    public $path = null;
-    public $xml = null;
-    public $xmlAttr = null;
-    public $xmlItem = null;
+    public $filePath = null;
 
+    public $xml = null;
+    public $docAttr = null;
+
+
+    public $selectType = null;
+    public $itemsArray = null;
+    public $itemsArrayWhere = null;
+    public $itemsArrayAnd = null;
+    public $itemsArrayOr = null;
+    public $itemsArrayResult = null;
 
     public function init($xml)
     {
         $this->xml = $xml;
-        $xmlArray = (array) $this->xml;
-        $this->xmlAttr = $xmlArray['@attributes'];
+        $xmlArray = (array) $xml;
 
-        $this->xmlItem = array_map(function($array){
-            $array = (array) $array;
+        $this->docAttr = $xmlArray['@attributes'];
+        $this->itemsArray = array_map(function ($array) {
+            $array = (array)$array;
             $newDataArray = $array;
             array_shift($newDataArray);
             $newDataArray['attr'] = $array['@attributes'];
             return $newDataArray;
         }, $xmlArray['item']);
 
+        $xml = null;
+        $xmlArray = null;
     }
 
 
-    public function toArray($typeBuild = 1)
+    public function items($id, $attr)
     {
-        $iter = 0;
-        $rootItems = array();
-        $xml = $this->xml;
+        $this->selectType = 'items';
+        $result = null;
 
-        foreach ($xml->item as $_item) {
-            $_attr = (array) $_item;
-            $_attrShift = array_shift($_attr);
-            if ($typeBuild == 1) {
-                $rootItems[$iter] = $_attr;
-                $rootItems[$iter]['attr'] = $_attrShift;
-            } else {
-                if ($typeBuild == 2) {
-                    $rootItems[$iter] = $_attrShift;
-                    $rootItems[$iter]['item'] = $_attr;
-                } else {
-                    $rootItems[$iter] = array_merge($_attr, $_attrShift);
-                }
-            }
-            $iter++;
-        }
-        return $rootItems;
-    }
-
-
-    public function item($id = null, $itemElement = null)
-    {
         if ($id == null) {
-            return $this->xmlItem;
+            $this->itemsArrayResult = $this->itemsArray;
         } else {
-            if (is_numeric($id) && $itemElement == null) {
-                foreach ($this->xmlItem as $item) {
-                    var_dump($item);
+
+            if ($attr == null) {
+                foreach ($this->itemsArray as $item) {
                     if ($item['attr']['id'] == $id) {
-                        return $item;
+                        $result[] = $item;
                     }
                 }
-            } else {
-                if (is_numeric($id) && $itemElement != null) {
-                    foreach ($this->xmlItem as $item) {
-                        if ($item['attr']['id'] == $id) {
-                            return $item->$itemElement;
-                        }
-                        else return null;
+            } else if ($attr != null) {
+
+                foreach ($this->itemsArray as $item) {
+                    if ($item['attr'][$attr] == $id) {
+                        $result[] = $item;
                     }
                 }
-                else return null;
-            }
+            } else return null;
         }
-        return null;
+        $this->itemsArrayResult = $result;
     }
 
-/*    public function attr($attr = null)
+    public function object()
     {
-        $_attrs = (array)$this->xml;
-        if ($attr == null) {
-            return $_attrs['@attributes'];
-        } else {
-            if (isset($_attrs['@attributes'][$attr])) {
-                return $_attrs['@attributes'][$attr];
-            } else {
-                return FALSE;
+        $this->itemsArrayResult = $this->xml;
+    }
+
+    public function where($rule)
+    {
+        $this->selectType = 'where';
+        $this->itemsArrayResult = $this->rules($this->itemsArray, $rule);
+    }
+
+    public function whereAnd($rule)
+    {
+        if ($this->itemsArrayResult == null) return false;
+        $this->itemsArrayResult = $this->rules($this->itemsArrayResult, $rule);
+        return true;
+    }
+
+    public function whereOr($rule)
+    {
+        if ($this->itemsArrayResult == null) return false;
+        $itemsWhereOr = $this->rules($this->itemsArray, $rule);
+        $this->itemsArrayResult = array_merge($this->itemsArrayResult,$itemsWhereOr);
+        return true;
+    }
+
+    protected function rules($itemsArray, $rule)
+    {
+        $itemsNew = null;
+        $col = null;
+        $val = null;
+
+        if ($el = stripos($rule, '<=')) {
+            $col = mb_strtolower(trim(substr($rule, 0, $el)));
+            $val = mb_strtolower(trim(substr($rule, $el + 2)));
+            foreach ($itemsArray as $item) {
+                if ($item['attr'][$col] <= $val)
+                    $itemsNew[] = $item;
+            }
+        } else
+        if ($el = stripos($rule, '>=')) {
+            $col = mb_strtolower(trim(substr($rule, 0, $el)));
+            $val = mb_strtolower(trim(substr($rule, $el + 2)));
+            foreach ($itemsArray as $item) {
+                if ($item['attr'][$col] >= $val)
+                    $itemsNew[] = $item;
+            }
+        } else
+        if ($el = stripos($rule, '!=')) {
+            $col = mb_strtolower(trim(substr($rule, 0, $el)));
+            $val = mb_strtolower(trim(substr($rule, $el + 2)));
+            foreach ($itemsArray as $item) {
+                if ($item['attr'][$col] != $val)
+                    $itemsNew[] = $item;
+            }
+        } else
+        if ($el = stripos($rule, '<')) {
+            $col = mb_strtolower(trim(substr($rule, 0, $el)));
+            $val = mb_strtolower(trim(substr($rule, $el + 1)));
+            foreach ($itemsArray as $item) {
+                if ($item['attr'][$col] < $val)
+                    $itemsNew[] = $item;
+            }
+        } else
+        if ($el = stripos($rule, '>')) {
+            $col = mb_strtolower(trim(substr($rule, 0, $el)));
+            $val = mb_strtolower(trim(substr($rule, $el + 1)));
+            foreach ($itemsArray as $item) {
+                if ($item['attr'][$col] > $val)
+                    $itemsNew[] = $item;
+            }
+        } else
+        if ($el = stripos($rule, '=')) {
+            $col = mb_strtolower(trim(substr($rule, 0, $el)));
+            $val = mb_strtolower(trim(substr($rule, $el + 1)));
+            foreach ($itemsArray as $item) {
+                if (mb_strtolower($item['attr'][$col]) == $val)
+                    $itemsNew[] = $item;
             }
         }
-    }*/
+        return $itemsNew;
+    }
 
-    public function sort($attr = 'id', $asc = 'ASC', $num = true)
+
+    public function result()
     {
-        $selectData = $this->xmlItem;
+        return $this->itemsArrayResult;
+    }
 
-        if ($num){
+
+    public function sort($attr, $asc, $num)
+    {
+        $selectData = $this->itemsArrayResult;
+
+        if ($num) {
             usort($selectData, function ($first, $second) use ($attr) {
                 return ($first['attr'][$attr] - $second['attr'][$attr]);
             });
@@ -115,29 +177,11 @@ class XMLWrapperSelect {
             });
         }
 
-        if (strtoupper($asc) == 'DESC'){
+        if (strtoupper($asc) == 'DESC') {
             $selectData = array_reverse($selectData);
         }
 
-        $selectData = array_values($selectData);
-
-        return $selectData;
+        $this->itemsArrayResult = array_values($selectData);
     }
-
-    /*public function __get($item)
-    {
-        var_dump($this->xmlItem);
-        if (isset($this->xmlAttr[$item])) {
-            return $this->xmlAttr[$item];
-        } else {
-
-            if (isset($this->xmlItem->$item)) {
-                return $this->xmlItem->$item;
-            } else {
-                return null;
-            }
-
-        }
-    }*/
 
 } 

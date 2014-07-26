@@ -1,162 +1,119 @@
 <?php
 
-
-include 'XMLWrapperSelect.php';
-include 'XMLWrapperCreate.php';
-include 'XMLWrapperInsert.php';
-include 'XMLWrapperUpdate.php';
-include 'XMLWrapperDelete.php';
+include_once 'XMLWrapperSelect.php';
+include_once 'XMLWrapperCreate.php';
+include_once 'XMLWrapperUpdate.php';
+include_once 'XMLWrapperInsert.php';
+include_once 'XMLWrapperDelete.php';
 
 class XMLWrapper
 {
-    public $config = array();
     public $debug = true;
+    public $path = null;
+    public $pathFile = null;
 
-    public $_listDocs = array();
-    public $_listItems = array();
+    public $docAttr = null;
+    public $docTree = null;
 
-    public $structureItem=null;
-    public $structureAttr=null;
-
+    /** @var object */
     public $XMLWrapperSelect = null;
+    /** @var object */
     public $XMLWrapperCreate = null;
-    public $XMLWrapperInsert = null;
+    /** @var object */
     public $XMLWrapperUpdate = null;
+    /** @var object */
+    public $XMLWrapperInsert = null;
+    /** @var object */
     public $XMLWrapperDelete = null;
 
-    /** @var int $count */
-    public $count = 0;
-    public $updateRows = 0;
     public $saveType = null;
-    public $xmlItem = null;
-    public $xmlAttr = null;
-    public $xml = null;
 
-
-    public function __construct(array $config = null)
+    public function __construct($path = null)
     {
-        $this->config($config);
+        if($path==null)
+            $path = dirname(__DIR__).'/xmlDB/';
+        $this->path = $path;
     }
 
-
-    public function config(array $config = null)
+    public function refresh()
     {
-        if ($config == null) {
-            $path = dirname(__DIR__) . '/db-xml/';
-            if (!$this->isDir($path)) {
-                $this->error('Не удалось создать директорию!');
-            }
-            $this->config['dbPath'] = $path;
-        } else {
-            if (!empty($config['dbPath'])) {
-                if (!$this->isDir($config['dbPath'])) {
-                    $this->error('Не удалось создать директорию!');
-                } else {
-                    $this->config = $config;
-                }
-            } else {
-                $this->error('Параметр конфигурации должен быть массивом!');
-            }
-        }
+        $this->XMLWrapperSelect = null;
+        $this->pathFile = null;
+        $this->docAttr = null;
     }
 
-
-
-    #          S E L E C T   D O C   M E T H O D S         #
-
-    public function select($failName)
+    /*   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+    select
+    */
+    public function select($fileName)
     {
-        if ($xml = $this->xml($failName)) {
-            $this->XMLWrapperSelect = new XMLWrapperSelect();
-            $this->XMLWrapperSelect->fileName = $failName;
-            $this->XMLWrapperSelect->init($xml);
-            $this->xmlAttr = $this->XMLWrapperSelect->xmlAttr;
-            $this->xmlItem = $this->XMLWrapperSelect->xmlItem;
-            $this->saveType = null;
-            return $this;
-        } else
-            $this->error();
+        $this->refresh();
+        $this->currentFileName = $fileName;
+
+        $this->pathFile = $this->getFile($fileName);
+        $this->XMLWrapperSelect = new XMLWrapperSelect();
+        $this->XMLWrapperSelect->init($this->xml());
+        $this->docAttr = $this->XMLWrapperSelect->docAttr;
+        return $this;
     }
 
-    public function item($id = null, $itemElement = null)
+    public function items($id = null, $attr = null)
     {
-        if ($this->xmlItem == null) {
-            $this->error('XML resource is empty!');
-        } else {
-            $result = $this->XMLWrapperSelect->item($id, $itemElement);
-            if($result!=null)
-                return $result;
-            else
-                $this->error('XML resource is empty!');
-        }
+        $this->XMLWrapperSelect->items($id, $attr);
+        return $this;
     }
 
-    public function items($id=null)
+    public function object()
     {
-        if ($this->xmlItem == null)
-            $this->error('XML resource is empty!');
+        $this->XMLWrapperSelect->xml;
+        return $this;
+    }
 
-        if ($id == null)
-            return $this->xmlItem;
-        else {
-            $result = $this->XMLWrapperSelect->item($id, null);
+    public function where($rule)
+    {
+        $this->XMLWrapperSelect->where($rule);
+        return $this;
+    }
 
-            if($result!=null)
-                return $result;
-            else
-                $this->error('XML resource is empty!');
-        }
+    public function whereAnd($rule)
+    {
+        $r = $this->XMLWrapperSelect->whereAnd($rule);
+        if($r===false)
+            $this->error('Method whereOr(...) must set after where(...)');
+        return $this;
+    }
+
+    public function whereOr($rule)
+    {
+        $r = $this->XMLWrapperSelect->whereOr($rule);
+        if($r===false)
+            $this->error('Method whereOr(...) must set after where(...)');
+        return $this;
     }
 
     public function sort($attr = 'id', $asc = 'ASC', $num = true)
     {
-        return $this->XMLWrapperSelect->sort($attr, $asc, $num);
+        $this->XMLWrapperSelect->sort($attr, $asc, $num );
+        return $this;
+    }
+
+    public function result()
+    {
+        $result = $this->XMLWrapperSelect->result();
+        return $result;
     }
 
 
-    public function listDocs()
+    /*   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+    create
+    */
+
+    public function create($fileName)
     {
-        $dirRes = dir($this->config['dbPath']);
-        while ($file = $dirRes->read()) {
-            if ($file != '.' and $file != '..' and !is_dir($file)) {
-                $this->_listDocs[] = $file;
-            }
-        }
-        return $this->_listDocs;
-    }
+        $this->currentFileName = $fileName;
 
-
-
-    /**
-     * @param string $type  'item' or 'attr'. Default 'item'
-     * @return array
-     */
-    public function structure($type='item')
-    {
-        if($this->structureItem==null){
-            foreach((array) $this->xml->item as $structureKey=>$structureValue){
-                if($structureKey != '@attributes')
-                    $this->structureItem[] = $structureKey;
-                if(is_array($structureValue))
-                    $this->structureAttr = array_keys($structureValue);
-            }
-        }
-
-        if($type=='item')
-            return $this->structureItem;
-        else if($type=='attr')
-            return $this->structureAttr;
-    }
-
-
-
-
-    #          C R E A T E   D O C   M E T H O D S         #
-
-    public function create($failName)
-    {
         $this->XMLWrapperCreate = new XMLWrapperCreate();
-        $this->XMLWrapperCreate->fileName = $failName;
+        $this->XMLWrapperCreate->fileName = $fileName;
         $this->saveType = 'create';
         return $this;
     }
@@ -200,16 +157,20 @@ class XMLWrapper
     }
 
 
+    /*   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+    update
+    */
+    public $count = 0;
 
-    #          U P D A T E   D O C   M E T H O D S         #
-
-
-    public function update($failName, $selectValue, $selectLocation = 'attr')
+    public function update($fileName, $selectValue, $selectLocation = 'attr')
     {
-        if ($xml = $this->xml($failName)) {
+
+        $this->currentFileName = $fileName;
+
+        if ($xml = $this->xml($fileName)) {
             $this->XMLWrapperUpdate = new XMLWrapperUpdate();
             $this->XMLWrapperUpdate->xml = $xml;
-            $this->XMLWrapperUpdate->fileName = $failName;
+            $this->XMLWrapperUpdate->fileName = $fileName;
 
             if (is_numeric($selectValue)) {
                 $this->XMLWrapperUpdate->selectValue = array('id' => $selectValue);
@@ -231,7 +192,7 @@ class XMLWrapper
         $result = $this->XMLWrapperUpdate->item($item, $value);
 
         if ($result) {
-            $this->updateRows += $result;
+            $this->count += $result;
             return $this;
         }
         $this->error();
@@ -244,10 +205,10 @@ class XMLWrapper
         $result = $this->XMLWrapperUpdate->attr($item, $value);
 
         if ($result) {
-            $this->updateRows += $result;
+            $this->count += $result;
             return $this;
         }
-        $this->error('Документ Не существует атрибута: ' . $item);
+        $this->error('У документа не существует атрибута: ' . $item);
     }
 
 
@@ -257,16 +218,21 @@ class XMLWrapper
         $result = $this->XMLWrapperUpdate->itemAttr($item, $value);
 
         if ($result) {
-            $this->updateRows += $result;
+            $this->count += $result;
             return $this;
         }
-        $this->error('Документ Не существует атрибута: ' . $item);
+        $this->error('У елемента item не существует атрибута: ' . $item);
     }
 
 
-    #          I N S E R T   M E T H O D S         #
+    /*   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+    insert
+    */
+    public $currentFileName = null;
+
     public function insert($fileName)
     {
+        $this->currentFileName = $fileName;
         if ($xml = $this->xml($fileName)) {
             $this->XMLWrapperInsert = new XMLWrapperInsert();
             $this->XMLWrapperInsert->xml = $xml;
@@ -281,17 +247,19 @@ class XMLWrapper
     }
 
 
-
-
-
     public function insertItem($item, $value = null)
     {
         $result = false;
         if (is_string($item)) {
-            if ($this->XMLWrapperInsert == null) $this->error();
+            if ($this->XMLWrapperInsert == null)
+                $this->error();
+
             $result = $this->XMLWrapperInsert->item($item, $value);
+
         } else if (is_array($item)) {
-            if ($this->XMLWrapperInsert == null) $this->error();
+            if ($this->XMLWrapperInsert == null)
+                $this->error();
+
             $result = $this->XMLWrapperInsert->item($item, false);
         }
         if ($result) {
@@ -319,17 +287,16 @@ class XMLWrapper
     }
 
 
-
-    #          D E L E T E   M E T H O D S         #
-
-
-    public function delete($fileName, $dump=true)
+    /*   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+    delete
+    */
+    public function delete($fileName, $makeDump=true)
     {
-        if(is_file($this->config['dbPath'].$fileName.'.xml')){
+        if(is_file($this->getFile($fileName))){
             $this->XMLWrapperDelete = new XMLWrapperDelete();
             $this->XMLWrapperDelete->fileName = $fileName;
-            $this->XMLWrapperDelete->path = $this->config['dbPath'];
-            $this->XMLWrapperDelete->dump = $dump;
+            $this->XMLWrapperDelete->path = $this->path;
+            $this->XMLWrapperDelete->dump = $makeDump;
 
             $this->saveType = 'delete';
             return $this;
@@ -339,27 +306,26 @@ class XMLWrapper
 
 
 
-    #          S Y S T E M   M E T H O D S         #
+    /*   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+    common
+    */
 
 
-    public function xml($file)
+
+    public function xml($nameFile=null)
     {
-        $path = $this->config['dbPath'] . $file . '.xml';
-        if ($fileData = file_get_contents($path)) {
-            $xml = new SimpleXMLElement($fileData);
-            if ($xml) {
-                //$this->xml = $xml;
-                return $xml;
-            } else
-                return false;
-        } else
-            return false;
+        if($nameFile==null)
+            $file_get = $this->pathFile;
+        else
+            $file_get = $this->path.$nameFile.'.xml';
+
+        if ($fileData = file_get_contents($file_get)) {
+            return new SimpleXMLElement($fileData);
+        } else {
+            return $this->error("Невозможно создать XML объект с файла: " . $this->pathFile);
+        }
     }
 
-
-    /**
-     * @return bool
-     */
     public function save()
     {
         $save = false;
@@ -371,6 +337,8 @@ class XMLWrapper
 
         } else if ($this->saveType == 'select') {
             # select
+
+
 
         } else if ($this->saveType == 'update') {
             # update
@@ -386,13 +354,11 @@ class XMLWrapper
             # delete
             if ($this->XMLWrapperDelete == null) $this->error();
             $save = $this->XMLWrapperDelete->delete();
+
         }
 
         if ($save) {
-
-            $this->xml = $save['data'];
-            $saveFile = $this->config['dbPath'] . $save['fileName'] . ".xml";
-
+            $saveFile = $this->path . $save['fileName'] . ".xml";
             if (file_put_contents($saveFile, $save['data']->asXML())) {
                 $this->saveType = null;
                 return true;
@@ -404,44 +370,60 @@ class XMLWrapper
 
     }
 
+    public $structureAttr = null;
+    public $structureItem = null;
     /**
-     * [isDir description]
-     * @param  [type]  $path [description]
-     * @return boolean       [description]
+     * @param string $type  'item' or 'attr'. Default 'item'
+     * @return array
      */
-    public function isDir($path)
+    public function structure($type='item')
     {
-        if (!is_dir($path)) {
-            if (!mkdir($path, 0777, TRUE)) {
-                return FALSE;
+        if($this->structureItem==null){
+            $xml = $this->xml($this->currentFileName);
+            foreach((array) $xml->item as $structureKey=>$structureValue)
+            {
+                if($structureKey != '@attributes')
+                    $this->structureItem[] = $structureKey;
+                if(is_array($structureValue))
+                    $this->structureAttr = array_keys($structureValue);
+            }
+        }
+
+        if($type=='item')
+            return $this->structureItem;
+        else if($type=='attr')
+            return $this->structureAttr;
+    }
+
+
+
+    /**
+     * @param $fileName
+     * @return bool|string
+     */
+    public function getFile($fileName)
+    {
+        $path = ($this->path != null) ? $this->path : dirname(__DIR__) . DIRECTORY_SEPARATOR . 'xwdb' . DIRECTORY_SEPARATOR;
+        if (is_dir($path)) {
+            if (is_file($path . $fileName . '.xml')) {
+                return $path . $fileName . '.xml';
             } else {
-                return TRUE;
+                return $this->error("Не верный путь или имя файла: " . $path . $fileName . '.xml');
             }
         } else {
-            return TRUE;
+            return $this->error("Не верный путь к директории: " . $path);
         }
-    }
-
-    public function enCode($text)
-    {
-        return htmlentities($text,ENT_QUOTES);
-    }
-
-
-    public function deCode($text)
-    {
-        return html_entity_decode($text,ENT_QUOTES);
     }
 
 
     public function error($text = '')
     {
-        if($this->debug)
-            die('ERROR: '.$text);
-        else
+        if ($this->debug) {
+            die('ERROR: ' . $text);
+        } else {
             return false;
+        }
     }
+
+
 }
-
-
-
