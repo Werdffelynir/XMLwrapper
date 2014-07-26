@@ -45,8 +45,31 @@ body{
 }
 
 .content{
-margin: 20px 5px;
+    /*margin: 20px 5px;*/
 }
+.block{
+    min-height: 300px;
+    background: #554A52;
+}
+.item{
+    margin: 5px 0;
+    padding: 5px;
+    border-bottom: 2px solid #64006B;
+}
+.item>h2 a{
+    color: #5F5B51;
+    text-decoration: none;
+}
+.item>h2 a:hover{
+    color: #64006B;
+}
+.item>.item-content{
+    padding: 3px 10px;
+}
+.item>.item-footer{
+    color: #64006B;
+}
+
 
 .footer{
     height: 15px;

@@ -59,7 +59,7 @@ class XMLWrapperInsert
     {
       foreach($itemSelector as $itemKey=>$itemValue){
         if(in_array($itemKey,$this->structureAttr))
-          $this->itemData[$itemKey] = $itemValue;//$this->itemData->addAttribute($itemKey,$itemValue);
+          $this->itemData[$itemKey] = $itemValue; //$this->itemData->addAttribute($itemKey,$itemValue);
         else
           return false;
       }
@@ -69,14 +69,14 @@ class XMLWrapperInsert
   public function save()
   {
     $iterator = (int) $this->xml['iterator'];
-    $countItems = count($this->xml->item);
+    //$countItems = count($this->xml->item);
 
-    $this->attr('id',$iterator);
+    $this->attr('id', $iterator);
     $this->xml['iterator'] = $iterator+1;
     $this->xml['date'] = time();
 
-    if($xml = $this->xml) {
-      return array('fileName'=>$this->fileName,'data'=>$xml);
+    if(!empty($this->xml)) {
+      return array('fileName'=>$this->fileName,'data'=>$this->xml);
     } else
       return false;
   }

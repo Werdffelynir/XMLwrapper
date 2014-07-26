@@ -28,6 +28,24 @@ $itemRows
         return $xml;
     }
 
+
+
+    public function attrs(array $attrs = array())
+    {
+        $this->attrRoot = $attrs;
+    }
+
+    public function items(array $items)
+    {
+        $this->items = array_merge($this->items, $items);
+    }
+
+
+    public function itemsAttrs(array $itemsAttrs)
+    {
+        $this->attrItem = $itemsAttrs;
+    }
+
     public function save()
     {
 
@@ -65,22 +83,6 @@ $itemRows
             return array('fileName' => $this->fileName, 'data' => $xml);
         } else
             return false;
-    }
-
-    public function attrs(array $attrs = array())
-    {
-        $this->attrRoot = $attrs;
-    }
-
-    public function items(array $items)
-    {
-        $this->items = array_merge($this->items, $items);
-    }
-
-
-    public function itemsAttrs(array $itemsAttrs)
-    {
-        $this->attrItem = $itemsAttrs;
     }
 
 }

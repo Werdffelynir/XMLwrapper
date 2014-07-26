@@ -290,13 +290,13 @@ class XMLWrapper
     /*   *   *   *   *   *   *   *   *   *   *   *   *   *   *
     delete
     */
-    public function delete($fileName, $makeDump=true)
+    public function delete($fileName)
     {
         if(is_file($this->getFile($fileName))){
+
             $this->XMLWrapperDelete = new XMLWrapperDelete();
             $this->XMLWrapperDelete->fileName = $fileName;
             $this->XMLWrapperDelete->path = $this->path;
-            $this->XMLWrapperDelete->dump = $makeDump;
 
             $this->saveType = 'delete';
             return $this;
@@ -304,7 +304,15 @@ class XMLWrapper
             $this->error("Файла $fileName не существует!");
     }
 
+    public function deleteDoc($makeDump=true)
+    {
+        $this->XMLWrapperDelete->doc($makeDump);
+    }
 
+    public function deleteItem($item)
+    {
+        $this->XMLWrapperDelete->item($item);
+    }
 
     /*   *   *   *   *   *   *   *   *   *   *   *   *   *   *
     common
@@ -353,8 +361,8 @@ class XMLWrapper
         } else if ($this->saveType == 'delete') {
             # delete
             if ($this->XMLWrapperDelete == null) $this->error();
-            $save = $this->XMLWrapperDelete->delete();
-
+            $this->XMLWrapperDelete->save();
+            $this->saveType = null;
         }
 
         if ($save) {

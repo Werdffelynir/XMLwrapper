@@ -50,7 +50,7 @@ class XMLWrapperSelect
         $result = null;
 
         if ($id == null) {
-            $this->itemsArrayResult = $this->itemsArray;
+            $result = $this->itemsArray;
         } else {
 
             if ($attr == null) {

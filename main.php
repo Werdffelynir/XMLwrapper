@@ -1,8 +1,9 @@
 <?
 define('TIMESTART',microtime(true));
 
-include './source/XMLWrapper.php';
-$xml = new XMLWrapper();
+//include './source/XMLWrapper.php';
+//$xml = new XMLWrapper();
+
 
 /*  *   *   *   *   *   *   *   *   *   *   *   *   *   *
  * select

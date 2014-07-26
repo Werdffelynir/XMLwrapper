@@ -80,10 +80,6 @@ body{
 
 
 
-form p{
-    font-style: italic;
-    color: #5F5B51;
-}
 input, select{
     width: 120px;
     margin-bottom: 6px;
@@ -91,12 +87,20 @@ input, select{
 input[type=text]{
     width: 280px;
 }
-textarea{
-    width: 705px;
-    height: 150px;
+.t-area{
+    background-color: #FFFFFF !important;
 }
-
-
+textarea{
+    width: 708px;
+    height: 150px;
+    background-color: #FFFFFF;
+}
+.nicEdit-main {
+    /*background: #FFFFFF !important;*/
+}
+.nicEdit-main:focus {
+    outline: none;
+}
 
 
 
