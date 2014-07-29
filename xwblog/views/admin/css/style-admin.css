@@ -1,0 +1,110 @@
+*{
+    font-family: 'Ubuntu Condensed', sans-serif;
+}
+body{
+    font-size: 12px;
+}
+
+/* PAGE */
+.page{
+    width: 960px;
+    margin: 0 auto;
+}
+
+
+/* LOGIN */
+.box-login{
+    width: 200px;
+    margin: 200px auto;
+}
+
+/*   T O P   P A N E L   */
+.panel-top{
+    background: #01342E;
+    height: 30px;
+    margin-bottom: 10px;
+}
+.panel-top a{
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 30px;
+    color: #E9F0F0;
+    text-decoration: none;
+    padding: 0 25px;
+}
+.panel-top a:hover{
+    background: #151C06;
+    color: #C4C0B6;
+}
+.logo{
+    float: right;
+    line-height: 30px;
+    color: #C4C0B6;
+    padding-right: 25px;
+}
+
+
+
+/*  L E F T   */
+.left{
+    background: #DBDED0;
+    padding: 5px;
+}
+
+.list-article a{
+    display: inline-block;
+    color: #64006B;
+    text-decoration: none;
+    padding: 2px 10px;
+    min-width: 100%;
+}
+.list-article a:hover{
+    background: #5F5B51;
+    color: #FFF;
+}
+
+
+
+
+
+
+
+
+
+/*  R I G H T   */
+.right{
+    background: #DBDED0;
+    padding: 5px;
+}
+
+
+
+input, select{
+    width: 120px;
+    margin-bottom: 6px;
+}
+input[type=text]{
+    width: 280px;
+}
+.t-area{
+    background-color: #FFFFFF !important;
+}
+textarea{
+    width: 708px;
+    height: 150px;
+    background-color: #FFFFFF;
+}
+.nicEdit-main {
+    /*background: #FFFFFF !important;*/
+}
+.nicEdit-main:focus {
+    outline: none;
+}
+
+
+
+
+
+
+
